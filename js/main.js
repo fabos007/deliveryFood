@@ -55,10 +55,11 @@ function notAuthorized() {
 
   function logIn(e) {
     e.preventDefault();
-    login = loginInput.value;
-    localStorage.setItem('gloDelivery', login);
 
-    if (login) {
+
+    if (loginInput.value.trim()) {
+      login = loginInput.value;
+      localStorage.setItem('gloDelivery', login);
       toggleModalAuth();
       buttonAuth.removeEventListener('click', toggleModalAuth);
       closeAuth.removeEventListener('click', toggleModalAuth);
@@ -69,6 +70,7 @@ function notAuthorized() {
       checkAuth();
     } else {
       loginInput.style.borderColor = 'red';
+      logInForm.reset();
     }
   }
 
