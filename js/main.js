@@ -1,83 +1,78 @@
-'use strict'
+"use strict";
 const cartButton = document.querySelector("#cart-button"),
   modal = document.querySelector(".modal"),
   close = document.querySelector(".close"),
-  buttonAuth = document.querySelector('.button-auth'),
-  modalAuth = document.querySelector('.modal-auth'),
-  closeAuth = document.querySelector('.close-auth'),
-  logInForm = document.querySelector('#logInForm'),
-  loginInput = document.querySelector('#login'),
-  userName = document.querySelector('.user-name'),
-  buttonOut = document.querySelector('.button-out'),
-  cardsRestaurants = document.querySelector('.cards-restaurants'),
-  containerPromo = document.querySelector('.container-promo'),
-  restaurants = document.querySelector('.restaurants'),
-  menu = document.querySelector('.menu'),
-  logo = document.querySelector('.logo'),
-  cardsMenu = document.querySelector('.cards-menu');
+  buttonAuth = document.querySelector(".button-auth"),
+  modalAuth = document.querySelector(".modal-auth"),
+  closeAuth = document.querySelector(".close-auth"),
+  logInForm = document.querySelector("#logInForm"),
+  loginInput = document.querySelector("#login"),
+  userName = document.querySelector(".user-name"),
+  buttonOut = document.querySelector(".button-out"),
+  cardsRestaurants = document.querySelector(".cards-restaurants"),
+  containerPromo = document.querySelector(".container-promo"),
+  restaurants = document.querySelector(".restaurants"),
+  menu = document.querySelector(".menu"),
+  logo = document.querySelector(".logo"),
+  cardsMenu = document.querySelector(".cards-menu");
 
-let login = localStorage.getItem('gloDelivery');
+let login = localStorage.getItem("gloDelivery");
 
 function toggleModal() {
   modal.classList.toggle("is-open");
 }
 
 function toggleModalAuth() {
-  modalAuth.classList.toggle('is-open');
-  loginInput.style.borderColor = ''
-};
+  modalAuth.classList.toggle("is-open");
+  loginInput.style.borderColor = "";
+}
 
 function authorized() {
   function logOut() {
     login = null;
-    localStorage.removeItem('gloDelivery');
-    buttonAuth.style.display = '';
-    userName.style.display = '';
-    buttonOut.style.display = '';
-    buttonOut.removeEventListener('click', logOut);
+    localStorage.removeItem("gloDelivery");
+    buttonAuth.style.display = "";
+    userName.style.display = "";
+    buttonOut.style.display = "";
+    buttonOut.removeEventListener("click", logOut);
     checkAuth();
   }
 
-  console.log('Authorized');
+  console.log("Authorized");
   userName.textContent = login;
-  buttonAuth.style.display = 'none';
-  userName.style.display = 'inline';
-  buttonOut.style.display = 'block';
+  buttonAuth.style.display = "none";
+  userName.style.display = "inline";
+  buttonOut.style.display = "block";
 
-  buttonOut.addEventListener('click', logOut);
-
+  buttonOut.addEventListener("click", logOut);
 }
 
 function notAuthorized() {
-  console.log('Not authorized');
+  console.log("Not authorized");
 
   function logIn(e) {
     e.preventDefault();
 
-
     if (loginInput.value.trim()) {
       login = loginInput.value;
-      localStorage.setItem('gloDelivery', login);
+      localStorage.setItem("gloDelivery", login);
       toggleModalAuth();
-      buttonAuth.removeEventListener('click', toggleModalAuth);
-      closeAuth.removeEventListener('click', toggleModalAuth);
-      logInForm.removeEventListener('submit', logIn);
+      buttonAuth.removeEventListener("click", toggleModalAuth);
+      closeAuth.removeEventListener("click", toggleModalAuth);
+      logInForm.removeEventListener("submit", logIn);
 
       logInForm.reset();
 
       checkAuth();
     } else {
-      loginInput.style.borderColor = 'red';
+      loginInput.style.borderColor = "red";
       logInForm.reset();
     }
   }
 
-
-  buttonAuth.addEventListener('click', toggleModalAuth);
-  closeAuth.addEventListener('click', toggleModalAuth);
-  logInForm.addEventListener('submit', logIn)
-
-
+  buttonAuth.addEventListener("click", toggleModalAuth);
+  closeAuth.addEventListener("click", toggleModalAuth);
+  logInForm.addEventListener("submit", logIn);
 }
 
 function checkAuth() {
@@ -107,13 +102,13 @@ function createCardRestaurants() {
       
     </div>
    
-  </a>`
-  cardsRestaurants.insertAdjacentHTML('beforeend', cards)
+  </a>`;
+  cardsRestaurants.insertAdjacentHTML("beforeend", cards);
 }
 
 function createCardGood() {
-  const card = document.createElement('div');
-  card.className = 'card'
+  const card = document.createElement("div");
+  card.className = "card";
   card.innerHTML = `
   <img src="img/pizza-plus/pizza-vesuvius.jpg" alt="image" class="card-image"/>
 				<div class="card-text">
@@ -134,45 +129,48 @@ function createCardGood() {
 						</button>
 						    <strong class="card-price-bold">545 ₽</strong>
 				</div>
-  `
-  cardsMenu.insertAdjacentElement('beforeend', card);
+  `;
+  cardsMenu.insertAdjacentElement("beforeend", card);
 }
 
 function openGoods(event) {
   let target = event.target;
-  const restaurant = target.closest('.card-restaurant');
+  const restaurant = target.closest(".card-restaurant");
 
   if (login) {
     if (restaurant) {
-      containerPromo.classList.add('hide');
-      restaurants.classList.add('hide');
-      menu.classList.remove('hide');
-      cardsMenu.textContent = '';
+      containerPromo.classList.add("hide");
+      restaurants.classList.add("hide");
+      menu.classList.remove("hide");
+      cardsMenu.textContent = "";
       createCardGood();
     }
   } else {
     toggleModalAuth();
-
   }
 }
 
-buttonAuth.addEventListener('click', toggleModalAuth);
+buttonAuth.addEventListener("click", toggleModalAuth);
 
-closeAuth.addEventListener('click', toggleModalAuth);
+closeAuth.addEventListener("click", toggleModalAuth);
 
 cartButton.addEventListener("click", toggleModal);
 
 close.addEventListener("click", toggleModal);
 
-cardsRestaurants.addEventListener('click', openGoods);
+cardsRestaurants.addEventListener("click", openGoods);
 
-logo.addEventListener('click', function () {
-  containerPromo.classList.remove('hide')
-  restaurants.classList.remove('hide')
-  menu.classList.add('hide')
+buttonOut.addEventListener("click", function () {
+  containerPromo.classList.remove("hide");
+  restaurants.classList.remove("hide");
+  menu.classList.add("hide");
 });
 
-
+logo.addEventListener("click", function () {
+  containerPromo.classList.remove("hide");
+  restaurants.classList.remove("hide");
+  menu.classList.add("hide");
+});
 
 checkAuth();
 
