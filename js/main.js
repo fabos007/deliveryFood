@@ -18,6 +18,22 @@ const cartButton = document.querySelector("#cart-button"),
 
 let login = localStorage.getItem("gloDelivery");
 
+const getData = async function (url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Ошибка по адресу ${url}, статус ошибки ${response.status}`)
+  }
+
+  return await response.json();
+};
+
+getData("./db/partners.json");
+
+const valid = function (str) {
+  const nameReg = /^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/;
+  return nameReg.test(str);
+};
+
 function toggleModal() {
   modal.classList.toggle("is-open");
 }
@@ -25,6 +41,12 @@ function toggleModal() {
 function toggleModalAuth() {
   modalAuth.classList.toggle("is-open");
   loginInput.style.borderColor = "";
+}
+
+function returnMain() {
+  containerPromo.classList.remove("hide");
+  restaurants.classList.remove("hide");
+  menu.classList.add("hide");
 }
 
 function authorized() {
@@ -36,6 +58,7 @@ function authorized() {
     buttonOut.style.display = "";
     buttonOut.removeEventListener("click", logOut);
     checkAuth();
+    returnMain();
   }
 
   console.log("Authorized");
@@ -53,7 +76,7 @@ function notAuthorized() {
   function logIn(e) {
     e.preventDefault();
 
-    if (loginInput.value.trim()) {
+    if (valid(loginInput.value.trim())) {
       login = loginInput.value;
       localStorage.setItem("gloDelivery", login);
       toggleModalAuth();
@@ -66,6 +89,7 @@ function notAuthorized() {
       checkAuth();
     } else {
       loginInput.style.borderColor = "red";
+      loginInput.value = "";
       logInForm.reset();
     }
   }
@@ -83,21 +107,32 @@ function checkAuth() {
   }
 }
 
-function createCardRestaurants() {
-  let cards = `<a class="card card-restaurant">
-    <img src="img/pizza-plus/preview.jpg" alt="image" class="card-image"/>
+function createCardRestaurants(restaurant) {
+  const {
+    image,
+    kitchen,
+    name,
+    price,
+    stars,
+    products,
+    time_of_delivery: timeOfDelivery
+  } = restaurant;
+
+
+  let cards = `<a class="card card-restaurant" data-products="${products}">
+    <img src="${image}" alt="image" class="card-image"/>
     <div class="card-text">
       <div class="card-heading">
-        <h3 class="card-title">Пицца плюс</h3>
-        <span class="card-tag tag">50 мин</span>
+        <h3 class="card-title">${name}</h3>
+        <span class="card-tag tag">${timeOfDelivery}</span>
       </div>
       
       <div class="card-info">
         <div class="rating">
-          4.5
+          ${stars}
         </div>
-        <div class="price">От 900 ₽</div>
-        <div class="category">Пицца</div>
+        <div class="price">${price}</div>
+        <div class="category">${kitchen}</div>
       </div>
       
     </div>
@@ -106,19 +141,26 @@ function createCardRestaurants() {
   cardsRestaurants.insertAdjacentHTML("beforeend", cards);
 }
 
-function createCardGood() {
+function createCardGood(goods) {
+  const {
+    description,
+    id,
+    name,
+    image,
+    price
+  } = goods;
+
   const card = document.createElement("div");
   card.className = "card";
   card.innerHTML = `
-  <img src="img/pizza-plus/pizza-vesuvius.jpg" alt="image" class="card-image"/>
+  <img src="${image}" alt="image" class="card-image"/>
 				<div class="card-text">
 						<div class="card-heading">
-								<h3 class="card-title card-title-reg">Пицца Везувий</h3>
+								<h3 class="card-title card-title-reg">${name}</h3>
 						</div>
 							
 				<div class="card-info">
-						<div class="ingredients">Соус томатный, сыр «Моцарелла», ветчина, пепперони, перец
-								«Халапенье», соус «Тобаско», томаты.
+						<div class="ingredients">${description}
 						</div>
 				</div>
 					
@@ -127,7 +169,7 @@ function createCardGood() {
 								<span class="button-card-text">В корзину</span>
 								<span class="button-cart-svg"></span>
 						</button>
-						    <strong class="card-price-bold">545 ₽</strong>
+						    <strong class="card-price-bold">${price}</strong>
 				</div>
   `;
   cardsMenu.insertAdjacentElement("beforeend", card);
@@ -139,39 +181,55 @@ function openGoods(event) {
 
   if (login) {
     if (restaurant) {
+      cardsMenu.textContent = "";
       containerPromo.classList.add("hide");
       restaurants.classList.add("hide");
       menu.classList.remove("hide");
-      cardsMenu.textContent = "";
-      createCardGood();
+      getData(`./db/${restaurant.dataset.products}`).then(function (data) {
+        data.forEach(createCardGood);
+      });
+
     }
   } else {
     toggleModalAuth();
   }
 }
 
-buttonAuth.addEventListener("click", toggleModalAuth);
+function init() {
+  getData('./db/partners.json').then(function (data) {
+    data.forEach(createCardRestaurants)
+  })
 
-closeAuth.addEventListener("click", toggleModalAuth);
 
-cartButton.addEventListener("click", toggleModal);
 
-close.addEventListener("click", toggleModal);
+  buttonAuth.addEventListener("click", toggleModalAuth);
 
-cardsRestaurants.addEventListener("click", openGoods);
+  closeAuth.addEventListener("click", toggleModalAuth);
 
-buttonOut.addEventListener("click", function () {
-  containerPromo.classList.remove("hide");
-  restaurants.classList.remove("hide");
-  menu.classList.add("hide");
-});
+  cartButton.addEventListener("click", toggleModal);
 
-logo.addEventListener("click", function () {
-  containerPromo.classList.remove("hide");
-  restaurants.classList.remove("hide");
-  menu.classList.add("hide");
-});
+  close.addEventListener("click", toggleModal);
 
-checkAuth();
+  cardsRestaurants.addEventListener("click", openGoods);
 
-createCardRestaurants();
+  logo.addEventListener("click", function () {
+    containerPromo.classList.remove("hide");
+    restaurants.classList.remove("hide");
+    menu.classList.add("hide");
+  });
+
+  checkAuth();
+
+
+  new Swiper(".swiper-container", {
+    loop: true,
+    autoplay: {
+      delay: 3000,
+    },
+    sliderPevView: 1,
+    slidesPerColumn: 1,
+  });
+
+}
+
+init();
