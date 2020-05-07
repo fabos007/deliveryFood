@@ -124,14 +124,14 @@ function createCardRestaurants(restaurant) {
     <div class="card-text">
       <div class="card-heading">
         <h3 class="card-title">${name}</h3>
-        <span class="card-tag tag">${timeOfDelivery}</span>
+        <span class="card-tag tag">${timeOfDelivery} мин</span>
       </div>
       
       <div class="card-info">
         <div class="rating">
           ${stars}
         </div>
-        <div class="price">${price}</div>
+        <div class="price">${price} руб.</div>
         <div class="category">${kitchen}</div>
       </div>
       
@@ -169,7 +169,7 @@ function createCardGood(goods) {
 								<span class="button-card-text">В корзину</span>
 								<span class="button-cart-svg"></span>
 						</button>
-						    <strong class="card-price-bold">${price}</strong>
+						    <strong class="card-price-bold">${price} руб.</strong>
 				</div>
   `;
   cardsMenu.insertAdjacentElement("beforeend", card);
